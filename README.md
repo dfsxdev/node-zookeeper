@@ -1,8 +1,13 @@
 # Overview
 
-node-zookeeper - A Node.js client for Apache Zookeeper.
+node-zookeeper - A Node.js client for Apache Zookeeper with cross platform support.
 
 This module is implemented on top of the ZooKeeper C API; consult the [ZK Reference](http://zookeeper.apache.org/doc/r3.4.0/index.html) for further details on behavior.
+
+# Prerequisite under Windows
+
+* Windows 7+ OS
+* Visual C++ Community/Professional 2015
 
 # Example
 

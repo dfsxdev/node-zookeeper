@@ -6,7 +6,6 @@ node_js:
   - "4"
   - "0.10"
 install:
-  - npm run-script prepublish
   - npm install
 script: echo "Skipping tests for now"
 env:

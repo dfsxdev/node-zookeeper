@@ -34,27 +34,57 @@
                     '<!(node -e "require(\'nan\')")'
                 ],
                 'libraries': ['<(module_root_dir)/deps/zookeeper/src/c/.libs/libzookeeper_st.a'],
+            }],['OS=="win"',{
+                'defines': [ 'USE_STATIC_LIB' ], 
+                'include_dirs': [
+                    '<(module_root_dir)/deps/zookeeper/src/c/include',
+                    '<(module_root_dir)/deps/zookeeper/src/c/generated',
+                    '<!(node -e "require(\'nan\')")'
+                ],
+                'libraries': ['<(module_root_dir)/deps/zookeeper/src/c/libs/$(Platform)/$(Configuration)/libzookeeper.lib'],
             }]
         ]},
         {
             'target_name': 'libzk',
             'type': 'none',
-            'actions': [{
-                'action_name': 'build_zk_client_lib',
-                'inputs': [''],
-                'outputs': [''],
-                'action': ['sh', 'scripts/build.sh']
-            }]
+            'conditions': [
+                ['OS!="win"', {
+                    'actions': [{
+                        'action_name': 'build_zk_client_lib',
+                        'inputs': [''],
+                        'outputs': [''],
+                        'action': ['sh', 'scripts/build.sh']
+                    }]
+                }], ['OS=="win"', {
+                    'actions': [{
+                        'action_name': 'build_zk_client_lib',
+                        'inputs': [''],
+                        'outputs': [''],
+                        'action': ['powershell.exe', '-f', 'scripts\\build.ps1', '$(Platform)', '$(Configuration)']
+                    }]
+                }]
+            ]
         },
         {
             "target_name": "after_build",
             "type": "none",
             "dependencies": ["zookeeper"],
-            "actions": [{
-                "action_name": "symlink",
-                "inputs": ["<@(PRODUCT_DIR)/zookeeper.node"],
-                "outputs": ["<(module_root_dir)/build/zookeeper.node"],
-                "action": ["sh", "scripts/symlink.sh", "<@(_inputs)"]
-            }]
+            'conditions': [
+                ['OS!="win"', {
+                    "actions": [{
+                        "action_name": "symlink",
+                        "inputs": ["<@(PRODUCT_DIR)/zookeeper.node"],
+                        "outputs": ["<(module_root_dir)/build/zookeeper.node"],
+                        "action": ["sh", "scripts/symlink.sh", "<@(_inputs)"]
+                    }]
+                }], ['OS=="win"', {
+                    "actions": [{
+                        "action_name": "symlink",
+                        "inputs": ["<@(PRODUCT_DIR)/zookeeper.node"],
+                        "outputs": ["<(module_root_dir)/build/zookeeper.node"],
+                        "action": ['powershell.exe', '-f', 'scripts\\symlink.ps1', '$(Configuration)']
+                    }]
+                }]
+            ]
     }],
 }

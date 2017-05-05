@@ -1,5 +1,4 @@
 #include <string.h>
-#include <strings.h>
 #include <errno.h>
 #include <assert.h>
 #include <stdarg.h>
@@ -41,7 +40,7 @@ static void hexToUchar(const char *hex, unsigned char *c) {
 }
 
 namespace zk {
-#define ZERO_MEM(member) bzero(&(member), sizeof(member))
+#define ZERO_MEM(member) memset(&(member), 0, sizeof(member))
 #define _LL_CAST_ (long long)
 #define _LLP_CAST_ (long long *)
 
@@ -79,6 +78,12 @@ DECLARE_SYMBOL (PRIVATE_PROP_ZK);
 DECLARE_SYMBOL (PRIVATE_PROP_HANDBACK);
 
 #define ZOOKEEPER_PASSWORD_BYTE_COUNT 16
+
+#ifdef _WIN32
+typedef SOCKET ZK_FD;
+#else
+typedef int ZK_FD;
+#endif
 
 void delete_on_close(uv_handle_t* handle) {
     free(handle);
@@ -250,7 +255,7 @@ public:
 
         last_activity = uv_now(uv_default_loop());
 
-        int oldFd = fd;
+		ZK_FD oldFd = fd;
         int rc = zookeeper_interest(zhandle, &fd, &interest, &tv);
 
         if (zk_io && uv_is_active((uv_handle_t*) zk_io)) {
@@ -296,7 +301,7 @@ public:
              }
 
              zk_io->data = this;
-             uv_poll_init(uv_default_loop(), zk_io, fd);
+			 uv_poll_init_socket(uv_default_loop(), zk_io, fd);
         }
 
         LOG_DEBUG(("yield: starting poll for %lp from thread %lp", this));
@@ -1020,7 +1025,7 @@ private:
     uv_poll_t* zk_io;
 
     uv_timer_t zk_timer;
-    int fd;
+    ZK_FD fd;
     int interest;
     timeval tv;
     int64_t last_activity; // time of last zookeeper event loop activity
