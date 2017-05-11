@@ -58,9 +58,9 @@
                 }], ['OS=="win"', {
                     'actions': [{
                         'action_name': 'build_zk_client_lib',
-                        'inputs': [''],
-                        'outputs': [''],
-                        'action': ['powershell.exe', '-f', 'scripts\\build.ps1', '$(Platform)', '$(Configuration)']
+                        'inputs': [],
+                        'outputs': ["<(module_root_dir)/deps/zookeeper/src/c/libs/$(Platform)/$(Configuration)/libzookeeper.lib"],
+                        'action': ['..\\scripts\\build.bat', '$(Platform)', '$(Configuration)']
                     }]
                 }]
             ]
@@ -82,7 +82,7 @@
                         "action_name": "symlink",
                         "inputs": ["<@(PRODUCT_DIR)/zookeeper.node"],
                         "outputs": ["<(module_root_dir)/build/zookeeper.node"],
-                        "action": ['powershell.exe', '-f', 'scripts\\symlink.ps1', '$(Configuration)']
+                        "action": ['..\\scripts\\symlink.bat', '$(Configuration)']
                     }]
                 }]
             ]
